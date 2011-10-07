@@ -1,0 +1,14 @@
+[
+	{
+		"opponent" : {
+			"id"		: 2,
+			"name"		: "Enemy",
+			"action"	: "kick"
+		},
+		"player" : {
+			"id"		: 1,
+			"name" 		: "Bilbo",
+			"action"	: "punch"
+		}
+	}
+]

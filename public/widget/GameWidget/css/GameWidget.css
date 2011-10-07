@@ -1,0 +1,56 @@
+#gameView .gameWidget {
+	width: 600px;
+	border: 2px solid;
+}
+
+.chatContainer {
+	width: 400px;
+	height: 600px;
+	float: right;
+}
+
+.chatContainer h3 {
+	float: left;
+}
+
+.userList {
+	width: 128px;
+	height: 600px;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	float: right;
+	border: 1px solid blue;
+	list-style: none;
+}
+
+.selectedUser {
+	background: #EEE;
+}
+
+.chatLog {
+	width: 269px;
+	height: 600px;
+	margin: 0;
+	padding: 0;
+	float: left;
+	border: 1px solid green;
+	border-right: none;
+	list-style: none;
+}
+
+.chatDirect {
+	color: #A0A;
+}
+
+.userActionMenu {
+	width: 400px;
+	opacity: 0;
+	list-style: none;
+	clear: both;
+}
+
+.fightContainer {
+	display: none;
+}
+

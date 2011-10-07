@@ -1,0 +1,29 @@
+<div>
+	<div class="loginContainer">
+		<label>User Name:</label><input type='text' data-dojo-attach-point="userName" class='userName'>
+		<button class="userLoginSubmit" dojoAttachEvent="onclick: userLogin">Login</button>
+		<p data-dojo-attach-point="loginError" class="loginError"></p>
+	</div>
+	<div class="chatContainer">
+		<h3>Chat Log</h3>
+		<ul data-dojo-attach-point="userList" class="userList">
+		</ul>
+		<ul data-dojo-attach-point="chatLog" class="chatLog">
+		</ul>
+	</div>
+
+	<ul class="controls userActionMenu">
+		<li><input type="text" data-dojo-attach-point="chatInput" class="chatInput"><button class="chatSubmit" dojoAttachEvent="onclick: submitChat">Submit Chat</button><button class="dmSubmit" dojoAttachEvent="onclick: submitDM">Direct Message</button></li>
+		<li><button class="startFight" dojoAttachEvent="onclick: startFight">Start Fight</button></li>
+	</ul>
+
+	<div class="fightContainer">
+		<h3>Fight Log</h3>
+		<ul data-dojo-attach-point="fightLog" class="fightLog">
+		</ul>
+		<ul class="fightActions">
+			<li><input type="button" value="kick" dojoType="dijit.form.Button" dojoAttachEvent="onclick: sendKick"></li>
+			<li><input type="button" value="punch" dojoType="dijit.form.Button" dojoAttachEvent="onclick: sendPunch"></li>
+		</ul>
+	</div>
+</div>

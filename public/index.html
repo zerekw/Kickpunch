@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dijit/themes/claro/claro.css" />
+	<link rel="stylesheet" href="widget/GameWidget/css/GameWidget.css" />
+	<style>
+		
+	</style>
+	
+	
+	<body>
+		<div id="gameView"></div>
+
+		<div id="actionContainer">
+		</div>
+		<div data-dojo-type="dijit.Dialog" data-dojo-props="title:'KickPunch Login'" id="userLogin">
+			
+		</div>
+	</body>
+<script>
+	var dojoConfig = {
+			isDebug: true,
+			// The next two pieces define how we can load our custom modules
+			// baseUrl species where to work from as a baseline
+			// Here we're setting it to be the current directory
+			baseUrl: './',
+			// modulePaths takes an object with keys that are the namespace,
+			// and values that are the path - in this case, just a folder
+				// named 'custom' under the baseUrl
+				modulePaths: {
+					'widget': 'widget'
+				}
+			}
+	</script>
+	<script src="socket.io/socket.io.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6.0/dojo/dojo.xd.js"></script>
+	<script>
+		dojo.require('widget.GameWidget');
+		dojo.require('dijit.form.Button');
+		dojo.require('dojox.html');
+
+		dojo.ready(function(){
+			// Attach handler to create new game views
+			var gameView = new widget.GameWidget().placeAt(dojo.byId('gameView'));
+		});
+	</script>
+</html>
