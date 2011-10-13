@@ -5,23 +5,12 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 
 dojo.declare("widget.GameWidget", [dijit._Widget, dijit._Templated], {
-	opponent : {
-		name	: "Opponent",
-		action	: "punch",
-		icon	: dojo.moduleUrl("widget.GameWidget", "img/sadface.jpg"),
-	},
-	player : {
-		name	: "You",
-		action	: "punch",
-		icon	: dojo.moduleUrl("widget.GameWidget", "img/happyface.jpg"),
-	},
 	templateString :
 		dojo.cache("widget.GameWidget", "templates/GameWidget.html"),
 	baseClass : "gameWidget",
 	socket : io.connect('http://localhost'),
 	postCreate : function() {
-		var widget = this,
-			domNode = this.domNode;
+		var widget = this;
 
 		this.socket.emit('userList');
 
@@ -69,9 +58,8 @@ dojo.declare("widget.GameWidget", [dijit._Widget, dijit._Templated], {
 		this.showControls();
 	},
 	hideLogin : function () {
-		var loginNode = dojo.query('.loginContainer', this.domNode);
-		console.log(loginNode);
-		loginNode.fadeOut().play();
+		console.log(this.loginContainer);
+		this.loginContainer.fadeOut().play();
 		/*dojo.fadeOut({ node: loginNode, onEnd: function () {
 
 				dojo.empty(loginNode);
