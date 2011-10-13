@@ -36,11 +36,11 @@ dojo.declare("widget.GameWidget", [dijit._Widget, dijit._Templated], {
 		});
 
 		this.socket.on('message', function (data) {
-			console.log(data);
+console.log(data);
 		});
 
 		this.socket.on('action', function (data) {
-			console.log(data);
+console.log(data);
 		});
 
 		this.socket.on('userList', function (users) {
@@ -58,14 +58,7 @@ dojo.declare("widget.GameWidget", [dijit._Widget, dijit._Templated], {
 		this.showControls();
 	},
 	hideLogin : function () {
-		console.log(this.loginContainer);
 		this.loginContainer.fadeOut().play();
-		/*dojo.fadeOut({ node: loginNode, onEnd: function () {
-
-				dojo.empty(loginNode);
-			}
-		}).play();
-		*/
 	},
 	showControls: function () {
 		dojo.query('.controls', this.domNode).fadeIn().play();
@@ -87,10 +80,6 @@ dojo.declare("widget.GameWidget", [dijit._Widget, dijit._Templated], {
 			var userId = dojo.attr(user, 'id');
 			widget.socket.emit('directMsg', userId, msg);
 		});
-		//var toUser = dojo.byId('directMessageTo').value,
-		//	msg = dojo.byId('directMessageText').value;
-		//socket.emit('directMessage', toUser, msg);
-		//console.log(toUser + ': ' + msg);
 	},
 	getChatInput : function () {
 		var msg = this.chatInput.value;
@@ -109,8 +98,8 @@ dojo.declare("widget.GameWidget", [dijit._Widget, dijit._Templated], {
 	addUser: function (userName, init) {
 		var userNode = dojo.create('li', { id: userName, class: 'user', innerHTML: userName });
 
-			dojo.connect(userNode, 'onclick', this.selectUser);
-			dojo.place(userNode, this.userList, 'last');
+		dojo.connect(userNode, 'onclick', this.selectUser);
+		dojo.place(userNode, this.userList, 'last');
 
 		if (!init) {
 			this.incomingChat(userName + ' has connected.');
@@ -134,13 +123,13 @@ dojo.declare("widget.GameWidget", [dijit._Widget, dijit._Templated], {
 console.log('startFight');
 	},
 	sendKick: function() {
-				socket.emit('action', { action:'kick' });
+		socket.emit('action', { action:'kick' });
 	},
 	sendPunch: function(e) {
-				sendAction('punch');
+		sendAction('punch');
 	},
 	sendAction: function(action) {
-					console.log(action);
-					// send websocket thing here
+console.log(action);
+		// send websocket thing here
 	}
 });
