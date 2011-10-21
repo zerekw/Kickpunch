@@ -9,6 +9,7 @@ dojo.declare("widget.GameWidget", [dijit._Widget, dijit._Templated], {
 		dojo.cache("widget.GameWidget", "templates/GameWidget.html"),
 	baseClass : "gameWidget",
 	socket : io.connect('http://localhost'),
+	userList : {},
 	postCreate : function() {
 		var widget = this;
 
@@ -58,7 +59,7 @@ console.log(data);
 		this.showControls();
 	},
 	hideLogin : function () {
-		this.loginContainer.fadeOut().play();
+		dojo.fadeOut({node : this.loginContainer}).play();
 	},
 	showControls: function () {
 		dojo.query('.controls', this.domNode).fadeIn().play();
@@ -99,6 +100,7 @@ console.log(data);
 		var userNode = dojo.create('li', { id: userName, class: 'user', innerHTML: userName });
 
 		dojo.connect(userNode, 'onclick', this.selectUser);
+		this.userList[userName] = userNode;
 		dojo.place(userNode, this.userList, 'last');
 
 		if (!init) {
@@ -106,18 +108,12 @@ console.log(data);
 		}
 	},
 	removeUser : function (userName) {
-		dojo.destroy(dojo.query('#' + userName, this.domNode)[0]);
+		dojo.destroy(this.userList[userName]);
+		delete this.userList[userName];
 	},
 	selectUser: function (e) {
-		var targetId = dojo.attr(e.target, 'id');
-		dojo.query('.userList li').forEach(function (li) {
-			if (dojo.attr(li, 'id') === targetId) {
-				dojo.addClass(li, 'selectedUser');
-			}
-			else {
-				dojo.removeClass(li, 'selectedUser');
-			}
-		});
+		dojo.removeClass('.userList li', 'selectedUser');
+		dojo.addClass(e.target, 'selectedUser');
 	},
 	startFight: function () {
 console.log('startFight');
