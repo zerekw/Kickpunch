@@ -148,6 +148,24 @@ HTTPClient.prototype.post = function (path, data, opts, fn) {
 };
 
 /**
+ * Issue a HEAD request
+ *
+ * @api private
+ */
+
+HTTPClient.prototype.head = function (path, opts, fn) {
+  if ('function' == typeof opts) {
+    fn = opts;
+    opts = {};
+  }
+
+  opts = opts || {};
+  opts.method = 'HEAD';
+
+  return this.request(path, opts, fn);
+};
+
+/**
  * Performs a handshake (GET) request
  *
  * @api private
@@ -179,7 +197,6 @@ client = function (port) {
  */
 
 create = function (cl) {
-  console.log('');
   var manager = io.listen(cl.port);
   manager.set('client store expiration', 0);
   return manager;
@@ -191,14 +208,14 @@ create = function (cl) {
  * @api private
  */
 
-function WSClient (port, sid) {
+function WSClient (port, sid, transport) {
   this.sid = sid;
   this.port = port;
-
+  this.transportName = transport || 'websocket';
   WebSocket.call(
       this
     , 'ws://localhost:' + port + '/socket.io/' 
-        + io.protocol + '/websocket/' + sid
+        + io.protocol + '/' + this.transportName + '/' + sid
   );
 };
 
@@ -239,6 +256,6 @@ WSClient.prototype.packet = function (pack) {
  * @api public
  */
 
-websocket = function (cl, sid) {
-  return new WSClient(cl.port, sid);
+websocket = function (cl, sid, transport) {
+  return new WSClient(cl.port, sid, transport);
 };
