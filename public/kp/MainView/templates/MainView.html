@@ -1,0 +1,17 @@
+<div>
+	<div .dojoType="dijit.Dialog" data-dojo-attach-point="loginDialog" title="KickPunch Login">
+		<label>User Name:</label>
+		<input dojoType="dijit.form.TextBox" type="text" data-dojo-attach-point="userName" trim="true">
+		<button dojoType="dijit.form.Button" type="button" data-dojo-attach-event="onclick: submitLogin">Login</button>
+		<ul data-dojo-attach-point="loginError"></ul>
+	</div>
+
+	<div dojoType="dijit.layout.BorderContainer" data-dojo-attach-point="mainView" style="width: 100%; height: 100%;" class="mainView">
+		<div dojoType="dijit.layout.ContentPane" region="top" class="mainTitle">
+			<span data-dojo-attach-point="userName">UserName</span> - <span data-dojo-attach-point="winCount">0</span> win / <span data-dojo-attach-point="lossCount">0</span> loss
+		</div>
+		<div dojoType="dijit.layout.TabContainer" data-dojo-attach-point="userViews" style="width: 100%; height: 100%;" region="center">
+		</div>
+	</div>
+
+</div>
