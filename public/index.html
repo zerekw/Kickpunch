@@ -14,21 +14,23 @@
 	</body>
 	<script>
 		var dojoConfig = {
-			isDebug: true,
 			// The next two pieces define how we can load our custom modules
 			// baseUrl species where to work from as a baseline
 			// Here we're setting it to be the current directory
-			baseUrl: './',
+			baseUrl: './javascripts/dojo-1.7.0/dojo/',
 			// modulePaths takes an object with keys that are the namespace,
 			// and values that are the path - in this case, just a folder
 			// named 'custom' under the baseUrl
 			modulePaths: {
-				'kp': 'kp'
+				'kp': '/kp'
 			}
 		}
 	</script>
+	<script src="/javascripts/dojo-1.7.0/dojo/dojo.js"></script>
 	<script src="socket.io/socket.io.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6.0/dojo/dojo.xd.js.uncompressed.js"></script>
+
+	<!-- <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6.0/dojo/dojo.xd.js.uncompressed.js"></script> -->
+
 	<script>
 		dojo.require('kp.MainView');
 		dojo.require('dojo.parser');
@@ -38,11 +40,7 @@
 			dojo.connect(dojo.byId('newView'), 'onclick', function (e) {
 				var button = e.target,
 					newWidget = new kp.MainView().placeAt(dojo.body());
-					console.log('after widget placement');
-					dojo.parser.parse();
-					console.log('after parse');
 					newWidget.startup();
-					console.log('new widget created');
 			});
 			// Attach handler to create new game views
 			//var gameView = new widget.GameWidget().placeAt(dojo.byId('gameView'));

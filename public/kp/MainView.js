@@ -17,8 +17,8 @@ dojo.require("kp.ChatView");
 dojo.declare("kp.MainView", [dijit._Widget, dijit._Templated, dijit._Contained], {
 	templateString: dojo.cache("kp.MainView", "templates/MainView.html"),
 	baseClass: "MainView",
+	widgetsInTemplate: true,
 	postCreate: function() {
-console.log("postCreate start");
 		var widget = this,
 			socket;
 
@@ -62,14 +62,14 @@ console.log(data);
 		});
 		*/
 
-		this.loadChat("Main Chat");
 console.log('postCreate end');
 	},
 	startup : function () {
-		// call layout startup stuff here?
-		console.log('startup');
-		console.log(this.loginDialog);
-		//
+		console.log('startup MainView');
+		this.inherited(arguments);
+				  console.log('startup end MainView');
+		this.loadChat("Main Chat");
+				  console.log('startup end MainView');
 		//dijit.byId(this.loginDialog).show();
 	},
 	submitLogin : function () {
@@ -94,7 +94,6 @@ console.log('postCreate end');
 		switch(type) {
 			case "chat":
 				newView = new kp.ChatView();
-		console.log('here');
 				break;
 		}
 		this.userViews.addChild(newView);
