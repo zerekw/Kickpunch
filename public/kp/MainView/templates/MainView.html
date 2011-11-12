@@ -1,16 +1,16 @@
 <div>
 	<div data-dojo-type="dijit.Dialog" data-dojo-attach-point="loginDialog" title="KickPunch Login">
 		<label>User Name:</label>
-		<input data-dojo-type="dijit.form.TextBox" type="text" data-dojo-attach-point="userName" trim="true">
-		<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-event="onclick: submitLogin">Login</button>
+		<input data-dojo-type="dijit.form.TextBox" type="text" name="userName" data-dojo-attach-point="userName" trim="true">
+		<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="submitLoginButton">Login</button>
 		<ul data-dojo-attach-point="loginError"></ul>
 	</div>
 
-	<div data-dojo-type="dijit.layout.BorderContainer" data-dojo-attach-point="mainView" style="width: 100%; height: 100%;" class="mainView">
-		<div data-dojo-type="dijit.layout.ContentPane" class="mainTitle" region="center">
-			<span data-dojo-attach-point="userName">UserName</span> - <span data-dojo-attach-point="winCount">0</span> win / <span data-dojo-attach-point="lossCount">0</span> loss
+	<div data-dojo-type="dijit.layout.BorderContainer" data-dojo-attach-point="mainView" class="mainView">
+		<div data-dojo-type="dijit.layout.ContentPane" class="mainTitle" region="top">
+			<span data-dojo-attach-point="userNameTitle">UserName</span> - <span data-dojo-attach-point="winCount">0</span> win / <span data-dojo-attach-point="lossCount">0</span> loss
 		</div>
-		<div data-dojo-type="dijit.layout.TabContainer" data-dojo-attach-point="userViews" style="width: 100%; height: 100%;" region="center">
+		<div data-dojo-type="dijit.layout.TabContainer" data-dojo-attach-point="userViews" region="center">
 		</div>
 	</div>
 

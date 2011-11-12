@@ -1,18 +1,13 @@
 <div>
-	<div data-dojo-type="dijit.layout.BorderContainer" class="chatView" data-dojo-title="Main Chat">
-		<ul data-dojo-type="dijit.layout.ContentPane" region="center" class="chatLog">
-			<li>Bob: Hello</li>
-			<li>Greg: Hi there</li>
+	<div data-dojo-type="dijit.layout.BorderContainer">
+		<div data-dojo-type="dijit.layout.ContentPane" data-dojo-attach-point="chatLog" region="center" class="chatLog">
+		</div>
+		<ul data-dojo-type="dijit.layout.ContentPane" data-dojo-attach-point="chatUsers" title="Users in chat" region="right" splitter="true" minSize="100" class="chatUsers">
 		</ul>
-		<ul data-dojo-type="dijit.layout.ContentPane" region="right" class="chatUsers">
-			<li>Bob</li>
-			<li>Greg</li>
-		</ul>
-		<div data-dojo-type="dijit.layout.ContentPane" region="bottom" class="chatActions">
-			<input type="text" data-dojo-attach-point="chatInput" data-dojo-type="dijit.form.TextBox" class="chatInput" trim="true">
+		<div data-dojo-type="dijit.layout.ContentPane" data-dojo-attach-point="chatActions" region="bottom" class="chatActions">
+			<input type="text"  data-dojo-type="dijit.form.TextBox" data-dojo-attach-point="chatInput" class="chatInput" trim="true">
 			<button type="button" data-dojo-type="dijit.form.Button" class="chatSubmit" data-dojo-attach-event="onclick: submitChat">Submit Chat</button>
 			<button type="button" data-dojo-type="dijit.form.Button" class="dmSubmit" data-dojo-attach-event="onclick: submitDM">Direct Message</button>
-			<button type="button" data-dojo-type="dijit.form.Button" class="startFight" data-dojo-attach-event="onclick: startFight">Start Fight</button>
 		</div>
 	</div>
 </div>

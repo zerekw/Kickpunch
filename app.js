@@ -1,14 +1,15 @@
-
 /**
  * Module dependencies.
  */
+var util = require('util'),
+	express = require('express'),
+	io = require('socket.io'),
+	views = {};
 
-var express = require('express'),
-	io = require('socket.io');
+var clients = {};
 
 var app = module.exports = express.createServer();
 
-var clients = {};
 
 // Configuration
 
@@ -16,7 +17,7 @@ app.configure(function(){
     app.set('views', __dirname + '/views');
     app.use(express.bodyDecoder());
     app.use(express.methodOverride());
-    app.use(express.compiler({ src: __dirname + '/public', enable: ['less'] }));
+    //app.use(express.compiler({ src: __dirname + '/public', enable: ['css'] }));
     app.use(app.router);
     app.use(express.staticProvider(__dirname + '/public'));
 });
@@ -43,6 +44,63 @@ io = io.listen(app);
 
 app.listen(3000);
 
+views.mainView = io.of('/mainView').on('connection', function (socket) {
+
+	socket.on('login', userLogin);
+	socket.on('disconnect', userDisconnect);
+	socket.on('getView', returnView);
+	socket.on('joinRoom', joinRoom);
+
+	function userLogin(userName) {
+		if (userName !== '' && clients[userName] === undefined) {
+			socket.set('userName', userName, function() {
+				clients[userName] = socket;
+
+				//socket.broadcast.emit('userConnect', userName);
+				socket.emit('loginSuccess', userName);
+			});
+		}
+		else {
+			socket.emit('error', 'login', 'User name is taken.');
+		}
+	}
+
+	function userDisconnect(userName) {
+		socket.broadcast.emit('userDisconnect', userName);
+	}
+
+	function joinRoom(roomId) {
+		socket.join(roomId);
+		socket.get('userName', function(err, userName) {
+			socket.broadcast.to(roomId).emit('userConnect', userName);
+			socket.emit('joinSuccess', usersInRoom(roomId));
+			//socket.emit('joinSuccess', Object.keys(clients));
+		});
+	}
+
+	function usersInRoom(roomId) {
+		var namespace = '/mainView/' + roomId,
+			roomClients = io.roomClients,
+			clientIds = Object.keys(io.roomClients),
+			clientsInRoom = [];
+		clientIds.forEach(function (el) {
+			if (roomClients[el][namespace]) {
+				clientsInRoom.push(getSocketsUserName(el));
+			}
+		});
+		return clientsInRoom;
+	}
+
+	function getSocketsUserName(socketId) {
+		return io.sockets.sockets[socketId].store.data.userName;
+	}
+
+	function returnView(viewId) {
+	}
+
+});
+
+/*
 io.sockets.on('connection', function (socket) {
 
 	socket.on('disconnect', function () {
@@ -52,15 +110,6 @@ io.sockets.on('connection', function (socket) {
 				userDisconnect(userName);
 			}
 		});
-	});
-
-	socket.on('login', function (userName) {
-		if (userName !== '' && clients[userName] === undefined) {
-			userConnect(userName);
-		}
-		else {
-			socket.emit('error', 'login', 'User name is taken.');
-		}
 	});
 
 	socket.on('userList', function () {
@@ -114,4 +163,4 @@ io.sockets.on('connection', function (socket) {
 	}
 
 });
-
+*/

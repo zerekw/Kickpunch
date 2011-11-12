@@ -22,8 +22,26 @@ dojo.declare("kp.MainView", [dijit._Widget, dijit._Templated, dijit._Contained],
 		var widget = this,
 			socket;
 
-		this.socket = io.connect("http://localhost", {"force new connection": true});
+		this.inherited(arguments);
+		this.socket = io.connect("http://localhost/mainView", {"force new connection": true});
 		socket = this.socket;
+
+		this.connect(this.submitLoginButton, "onClick", this.submitLogin);
+
+		socket.on("loginSuccess", function (userName) {
+			widget.loginSuccess(userName);
+		});
+
+		socket.on("error", function (type, msg) {
+			widget.displayError(type, msg);
+		});
+
+		socket.on("loadView", function () {
+			widget.loadView(arguments);
+		});
+
+		
+
 
 		/*
 		socket.emit("userList");
@@ -35,14 +53,6 @@ dojo.declare("kp.MainView", [dijit._Widget, dijit._Templated, dijit._Contained],
 		socket.on("userDisconnect", function (userName) {
 			widget.incomingChat(userName + " has disconnected.");
 			widget.removeUser(userName);
-		});
-
-		socket.on("connectSuccess", function (userName) {
-			widget.connectSuccess(userName);
-		});
-
-		socket.on("error", function (type, msg) {
-			widget.displayError(type, msg);
 		});
 
 		socket.on("chat", function (data) {
@@ -62,43 +72,48 @@ console.log(data);
 		});
 		*/
 
-console.log('postCreate end');
 	},
-	startup : function () {
-		console.log('startup MainView');
+	startup: function () {
 		this.inherited(arguments);
-				  console.log('startup end MainView');
-		this.loadChat("Main Chat");
-				  console.log('startup end MainView');
-		//dijit.byId(this.loginDialog).show();
+		this.showLogin();
 	},
-	submitLogin : function () {
+	destroy: function () {
+		this.socket.emit('disconnect');
+	},
+	displayError: function (type, msg) {
+		this[type + "Error"].innerHTML = msg;
+	},
+	submitLogin: function () {
 		this.socket.emit("login", this.userName.value);
 	},
-	connectSuccess : function (userName) {
+	loginSuccess: function (userName) {
+		this.loadView("chat", "Main Chat");
 		this.loginError.innerHTML = "";
-		this.incomingChat("You have connected as " + userName);
+		this.userNameTitle.innerHTML = userName;
 		this.hideLogin();
-		this.showControls();
 	},
-	hideLogin : function () {
-		dojo.fadeOut({node : this.loginContainer}).play();
+	showLogin: function () {
+		this.loginDialog.show();
+	},
+	hideLogin: function () {
+		this.loginDialog.hide();
 	},
 
-
-	loadChat: function (chatTitle) {
-		this.loadView("chat", chatTitle);
+	loadChat: function (chatId) {
+		this.getView(chatId);
 	},
-	loadView: function (type, title) {
+	getView: function (id) {
+		this.socket.emit("getView", id);
+	},
+	loadView: function (type, viewId) {
 		var newView;
 		switch(type) {
 			case "chat":
-				newView = new kp.ChatView();
+				newView = new kp.ChatView({socket: this.socket, viewId: viewId});
 				break;
 		}
 		this.userViews.addChild(newView);
 	},
-
 
 
 	showControls: function () {
@@ -110,11 +125,11 @@ console.log('postCreate end');
 			this.socket.emit("chatMsg", msg);
 		}
 	},
-	incomingChat : function (msg, type) {
+	incomingChat: function (msg, type) {
 		dojo.create("li", { innerHTML: msg }, this.chatLog, "first");
 	},
 	// collect selected users and send direct message
-	submitDM : function () {
+	submitDM: function () {
 		var widget = this,
 			msg = this.getChatInput();
 		dojo.query(".selectedUser", this.domNode).forEach(function (user) {
@@ -122,14 +137,10 @@ console.log('postCreate end');
 			widget.socket.emit("directMsg", userId, msg);
 		});
 	},
-	getChatInput : function () {
+	getChatInput: function () {
 		var msg = this.chatInput.value;
 		this.chatInput.value = "";
 		return msg;
-	},
-	displayError : function (type, msg) {
-		var domNode = dojo.query("." + type + "Error", this.domNode)[0];
-		domNode.innerHTML = msg;
 	},
 	buildUserList: function (users) {
 		users.forEach(function (userName) {
@@ -147,7 +158,7 @@ console.log('postCreate end');
 			this.incomingChat(userName + " has connected.");
 		}
 	},
-	removeUser : function (userName) {
+	removeUser: function (userName) {
 		// the event attached to each user needs to be remvoed
 		dojo.destroy(this.userList[userName]);
 		delete this.userList[userName];
