@@ -40,9 +40,7 @@ dojo.declare("kp.MainView", [dijit._Widget, dijit._Templated, dijit._Contained],
 			widget.loadView(arguments);
 		});
 
-		
-
-
+		dojo.addOnWindowUnload(this.destroy);
 		/*
 		socket.emit("userList");
 
@@ -77,8 +75,10 @@ console.log(data);
 		this.inherited(arguments);
 		this.showLogin();
 	},
+	// disconnect the node client if the widget is destroyed
 	destroy: function () {
 		this.socket.emit('disconnect');
+		this.inherited(arguments);
 	},
 	displayError: function (type, msg) {
 		this[type + "Error"].innerHTML = msg;

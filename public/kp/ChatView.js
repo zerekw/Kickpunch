@@ -46,6 +46,9 @@ dojo.declare("kp.ChatView", [dijit._Widget, dijit._Templated, dijit._Contained],
 			widget.incomingChat(data);
 		});
 
+		this.connect(this.chatSubmit, "onClick", this.submitChat);
+		this.connect(this.dmSubmit, "onClick", this.submitDM);
+
 	},
 	joinSuccess: function (users) {
 		users.forEach(function (userName) {
@@ -58,12 +61,7 @@ dojo.declare("kp.ChatView", [dijit._Widget, dijit._Templated, dijit._Contained],
 
 		dojo.connect(userNode, "onclick", this.selectUser);
 		chatUsers[userName] = userNode;
-		chatUsers.set('content', chatUsers.content + userNode);
-		//chatUsers.content = chatUsers.content + userNode;
-		var foo = chatUsers.get('content');
-		debugger;
-		//this.content = this.content + userNode;
-		//dojo.place(userNode, this.chatUsers, "last");
+		dojo.place(userNode, this.chatUsers, "last");
 
 		if (!init) {
 			this.incomingChat(userName + " has connected.");
@@ -97,8 +95,9 @@ dojo.declare("kp.ChatView", [dijit._Widget, dijit._Templated, dijit._Contained],
 		});
 	},
 	getChatInput: function () {
-		var msg = this.chatInput.value;
-		this.chatInput.value = "";
+		var msg = this.chatInput.attr("value");
+		//this.chatInput.value = "";
+		this.chatInput.attr("value", "");
 		return msg;
 	}
 });

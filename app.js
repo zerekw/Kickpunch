@@ -50,6 +50,8 @@ views.mainView = io.of('/mainView').on('connection', function (socket) {
 	socket.on('disconnect', userDisconnect);
 	socket.on('getView', returnView);
 	socket.on('joinRoom', joinRoom);
+	socket.on('chatMsg', sendChatMsg);
+	socket.on('directMsg', sendDirectMsg);
 
 	function userLogin(userName) {
 		if (userName !== '' && clients[userName] === undefined) {
@@ -66,13 +68,18 @@ views.mainView = io.of('/mainView').on('connection', function (socket) {
 	}
 
 	function userDisconnect(userName) {
+		socket.get('userName', function (err, userName) {
+			if (userName) {
+				delete clients[userName];
+			}
+		});
 		socket.broadcast.emit('userDisconnect', userName);
 	}
 
 	function joinRoom(roomId) {
 		socket.join(roomId);
 		socket.get('userName', function(err, userName) {
-			socket.broadcast.to(roomId).emit('userConnect', userName);
+			socket.broadcast.to(roomId).emit('userJoin', userName);
 			socket.emit('joinSuccess', usersInRoom(roomId));
 			//socket.emit('joinSuccess', Object.keys(clients));
 		});
@@ -93,6 +100,20 @@ views.mainView = io.of('/mainView').on('connection', function (socket) {
 
 	function getSocketsUserName(socketId) {
 		return io.sockets.sockets[socketId].store.data.userName;
+	}
+
+	function sendChatMsg(msg) {
+		socket.get('userName', function (err, userName) {
+			msg = userName + ": " + msg;
+			socket.emit('chat', msg, 'chatGeneral');
+			socket.broadcast.emit('chat', msg, 'chatGeneral');
+		});
+	}
+
+	function sendDirectMsg(userName, msg) {
+		var socketUser = clients[userName];
+		msg = "(DM) " + userName + ": " + msg;
+		socketUser.emit('chat', msg, 'chatDirect');
 	}
 
 	function returnView(viewId) {
