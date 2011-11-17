@@ -16,8 +16,9 @@ dojo.declare("kp.ChatView", [dijit._Widget, dijit._Templated, dijit._Contained],
 	constructor: function(options) {
 		this.inherited(arguments);
 		this.socket = options.socket;
-		this.title = options.viewId;
-		this.viewId = options.viewId;
+		//this.socket = io.connect("http://localhost/chat");
+		this.title = options.nsp;
+		this.nsp = options.nsp;
 	},
 	postCreate: function() {
 		var widget = this,
@@ -26,20 +27,22 @@ dojo.declare("kp.ChatView", [dijit._Widget, dijit._Templated, dijit._Contained],
 		this.inherited(arguments);
 		socket = this.socket;
 
-		socket.emit("joinRoom", this.viewId);
-		socket.emit("userList");
+		socket.emit("joinRoom", this.nsp);
 
 		socket.on("joinSuccess", function (userList) {
 			widget.joinSuccess(userList);
 		});
 
-		socket.on("userJoin", function (userName) {
-			widget.addUser(userName);
+		socket.on("userJoin", function (data) {
+			widget.addUser(data);
 		});
 
-		socket.on("userLeave", function (userName) {
-			widget.incomingChat(userName + " has left.");
-			widget.removeUser(userName);
+		socket.on("userDisconnect", function (data) {
+			widget.userDisconnect(data);
+		});
+
+		socket.on("userLeave", function (data) {
+			widget.removeUser(data);
 		});
 
 		socket.on("chat", function (data) {
@@ -50,24 +53,36 @@ dojo.declare("kp.ChatView", [dijit._Widget, dijit._Templated, dijit._Contained],
 		this.connect(this.dmSubmit, "onClick", this.submitDM);
 
 	},
+	confirmNsp: function (nsp) {
+		return nsp === this.nsp || nsp === 'all';
+	},
 	joinSuccess: function (users) {
+		this.chatUsers.innerHTML = "";
 		users.forEach(function (userName) {
-			this.addUser(userName, true);
+			this.addUser({nsp: this.nsp, userName: userName, init: true});
 		}, this);
 	},
-	addUser: function (userName, init) {
+	addUser: function (data) {
 		var chatUsers = this.chatUsers,
+			userName = data.userName,
 			userNode = dojo.create("li", { id: userName, class: "user", innerHTML: userName });
+
+		if (!this.confirmNsp(data.nsp)) { return; }
 
 		dojo.connect(userNode, "onclick", this.selectUser);
 		chatUsers[userName] = userNode;
 		dojo.place(userNode, this.chatUsers, "last");
 
-		if (!init) {
-			this.incomingChat(userName + " has connected.");
+		if (!data.init) {
+			this.incomingChat({nsp: data.nsp, msg: userName + " has connected."});
 		}
 	},
-	removeUser: function (userName) {
+	removeUser: function (data) {
+		var userName = data.userName;
+
+		if (!this.confirmNsp(data.nsp)) { return; }
+
+		this.incomingChat(userName + " has left.");
 		// the event attached to each user needs to be remvoed
 		dojo.destroy(this.chatUsers[userName]);
 		delete this.chatUsers[userName];
@@ -79,11 +94,16 @@ dojo.declare("kp.ChatView", [dijit._Widget, dijit._Templated, dijit._Contained],
 	submitChat: function () {
 		var msg = this.getChatInput();
 		if (msg != "") {
-			this.socket.emit("chatMsg", msg);
+			this.socket.emit("chatMsg", this.nsp, msg);
 		}
 	},
-	incomingChat: function (msg, type) {
-		dojo.create("li", { innerHTML: msg }, this.chatLog, "first");
+	incomingChat: function (data) {
+		if (!this.confirmNsp(data.nsp)) { return; }
+
+		if (!data.msgType) {
+			data.msgType = "chatGeneral";
+		}
+		dojo.create("li", { innerHTML: data.msg, class: data.msgType }, this.chatLog, "first");
 	},
 	// collect selected users and send direct message
 	submitDM: function () {
@@ -91,7 +111,7 @@ dojo.declare("kp.ChatView", [dijit._Widget, dijit._Templated, dijit._Contained],
 			msg = this.getChatInput();
 		dojo.query(".selectedUser", this.domNode).forEach(function (user) {
 			var userId = dojo.attr(user, "id");
-			widget.socket.emit("directMsg", userId, msg);
+			widget.socket.emit("directMsg", this.nsp, userId, msg);
 		});
 	},
 	getChatInput: function () {

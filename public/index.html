@@ -11,7 +11,6 @@
 	
 	
 	<body class=" claro ">
-		<button id="newView">New View</button>
 	</body>
 	<script>
 		var dojoConfig = {
@@ -38,13 +37,15 @@
 		// check out Floating Panes
 		// http://dojotoolkit.org/reference-guide/dojox/layout/FloatingPane.html
 		dojo.ready(function(){
+			var newWidget = new kp.MainView().placeAt(dojo.body());
+			newWidget.startup();
+			/*
 			dojo.connect(dojo.byId('newView'), 'onclick', function (e) {
 				var button = e.target,
 					newWidget = new kp.MainView().placeAt(dojo.body());
 					newWidget.startup();
 			});
-			// Attach handler to create new game views
-			//var gameView = new widget.GameWidget().placeAt(dojo.byId('gameView'));
+			*/
 		});
 	</script>
 </html>

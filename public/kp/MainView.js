@@ -18,15 +18,20 @@ dojo.declare("kp.MainView", [dijit._Widget, dijit._Templated, dijit._Contained],
 	templateString: dojo.cache("kp.MainView", "templates/MainView.html"),
 	baseClass: "MainView",
 	widgetsInTemplate: true,
+	constructor: function() {
+		this.inherited(arguments);
+		this.socket = io.connect("http://localhost/");
+	},
 	postCreate: function() {
 		var widget = this,
 			socket;
 
 		this.inherited(arguments);
-		this.socket = io.connect("http://localhost/mainView", {"force new connection": true});
 		socket = this.socket;
 
 		this.connect(this.submitLoginButton, "onClick", this.submitLogin);
+		this.connect(this.joinNewChat, "onClick", this.showJoinChatDialog);
+		this.connect(this.submitJoinChat, "onClick", this.joinChat);
 
 		socket.on("loginSuccess", function (userName) {
 			widget.loginSuccess(userName);
@@ -41,42 +46,13 @@ dojo.declare("kp.MainView", [dijit._Widget, dijit._Templated, dijit._Contained],
 		});
 
 		dojo.addOnWindowUnload(this.destroy);
-		/*
-		socket.emit("userList");
-
-		socket.on("userConnect", function (userName) {
-			widget.addUser(userName);
-		});
-
-		socket.on("userDisconnect", function (userName) {
-			widget.incomingChat(userName + " has disconnected.");
-			widget.removeUser(userName);
-		});
-
-		socket.on("chat", function (data) {
-			widget.incomingChat(data);
-		});
-
-		socket.on("message", function (data) {
-console.log(data);
-		});
-
-		socket.on("action", function (data) {
-console.log(data);
-		});
-
-		socket.on("userList", function (users) {
-			widget.buildUserList(users);
-		});
-		*/
-
 	},
 	startup: function () {
 		this.inherited(arguments);
 		this.showLogin();
 	},
-	// disconnect the node client if the widget is destroyed
 	destroy: function () {
+		// disconnect the node client if the widget is destroyed
 		this.socket.emit('disconnect');
 		this.inherited(arguments);
 	},
@@ -86,6 +62,7 @@ console.log(data);
 	submitLogin: function () {
 		this.socket.emit("login", this.userName.value);
 	},
+	// on error this is still happening
 	loginSuccess: function (userName) {
 		this.loadView("chat", "Main Chat");
 		this.loginError.innerHTML = "";
@@ -99,85 +76,26 @@ console.log(data);
 		this.loginDialog.hide();
 	},
 
-	loadChat: function (chatId) {
-		this.getView(chatId);
+	showJoinChatDialog: function () {
+		this.joinChatDialog.show();
 	},
-	getView: function (id) {
-		this.socket.emit("getView", id);
+	hideJoinChatDialog: function () {
+		this.joinChatDialog.hide();
 	},
-	loadView: function (type, viewId) {
+	joinChat: function () {
+		var nspChat = this.joinChatId;
+		this.loadView('chat', nspChat.attr("value"));
+		nspChat.attr("value", "");
+		nspChat.attr("displayValue", "");
+		this.hideJoinChatDialog();
+	},
+	loadView: function (type, nsp) {
 		var newView;
 		switch(type) {
 			case "chat":
-				newView = new kp.ChatView({socket: this.socket, viewId: viewId});
+				newView = new kp.ChatView({socket: this.socket, nsp: nsp});
 				break;
 		}
 		this.userViews.addChild(newView);
 	},
-
-
-	showControls: function () {
-		dojo.query(".controls", this.domNode).fadeIn().play();
-	},
-	submitChat: function () {
-		var msg = this.getChatInput();
-		if (msg != "") {
-			this.socket.emit("chatMsg", msg);
-		}
-	},
-	incomingChat: function (msg, type) {
-		dojo.create("li", { innerHTML: msg }, this.chatLog, "first");
-	},
-	// collect selected users and send direct message
-	submitDM: function () {
-		var widget = this,
-			msg = this.getChatInput();
-		dojo.query(".selectedUser", this.domNode).forEach(function (user) {
-			var userId = dojo.attr(user, "id");
-			widget.socket.emit("directMsg", userId, msg);
-		});
-	},
-	getChatInput: function () {
-		var msg = this.chatInput.value;
-		this.chatInput.value = "";
-		return msg;
-	},
-	buildUserList: function (users) {
-		users.forEach(function (userName) {
-			this.addUser(userName, true);
-		}, this);
-	},
-	addUser: function (userName, init) {
-		var userNode = dojo.create("li", { id: userName, class: "user", innerHTML: userName });
-
-		dojo.connect(userNode, "onclick", this.selectUser);
-		this.userList[userName] = userNode;
-		dojo.place(userNode, this.userList, "last");
-
-		if (!init) {
-			this.incomingChat(userName + " has connected.");
-		}
-	},
-	removeUser: function (userName) {
-		// the event attached to each user needs to be remvoed
-		dojo.destroy(this.userList[userName]);
-		delete this.userList[userName];
-	},
-	selectUser: function (e) {
-		dojo.query("li", this.userList).removeClass("selectedUser");
-		dojo.addClass(e.target, "selectedUser");
-	},
-	startFight: function () {
-console.log("startFight");
-	},
-	sendKick: function() {
-		socket.emit("action", { action:"kick" });
-	},
-	sendPunch: function(e) {
-		sendAction("punch");
-	},
-	sendAction: function(action) {
-console.log(action);
-		// send websocket thing here
-	}
 });

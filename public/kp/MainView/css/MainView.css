@@ -1,6 +1,6 @@
 .MainView {
 	width: 700px;
-	height: 600px;
+	height: 500px;
 	border: 2px solid;
 	position: relative;
 }
@@ -8,6 +8,15 @@
 .MainView .dijitContainer {
 	width: 100%;
 	height: 100%;
+}
+
+.MainView .MainViewTitleBar {
+	width: 100%;
+	height: 60px;
+}
+
+.MainView .MainViewActions {
+	width: 100px;
 }
 
 .fightContainer {

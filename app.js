@@ -44,21 +44,19 @@ io = io.listen(app);
 
 app.listen(3000);
 
-views.mainView = io.of('/mainView').on('connection', function (socket) {
+io.sockets.on('connection', function (socket) {
 
 	socket.on('login', userLogin);
-	socket.on('disconnect', userDisconnect);
-	socket.on('getView', returnView);
+	socket.on('disconnect', clientDisconnect);
 	socket.on('joinRoom', joinRoom);
-	socket.on('chatMsg', sendChatMsg);
-	socket.on('directMsg', sendDirectMsg);
+	socket.on('leaveRoom', leaveRoom);
+	socket.on('chatMsg', emitChatMsg);
+	socket.on('directMsg', emitDirectMsg);
 
 	function userLogin(userName) {
 		if (userName !== '' && clients[userName] === undefined) {
 			socket.set('userName', userName, function() {
 				clients[userName] = socket;
-
-				//socket.broadcast.emit('userConnect', userName);
 				socket.emit('loginSuccess', userName);
 			});
 		}
@@ -67,26 +65,40 @@ views.mainView = io.of('/mainView').on('connection', function (socket) {
 		}
 	}
 
-	function userDisconnect(userName) {
+	function emitToRoom(roomId, action, data) {
+		data['nsp'] = roomId;
+		socket.broadcast.to(roomId).emit(action, data);
+		socket.emit(action, data);
+	}
+	
+	function clientDisconnect(roomId) {
 		socket.get('userName', function (err, userName) {
 			if (userName) {
 				delete clients[userName];
+				leaveRoom('all');
 			}
 		});
-		socket.broadcast.emit('userDisconnect', userName);
 	}
 
 	function joinRoom(roomId) {
 		socket.join(roomId);
 		socket.get('userName', function(err, userName) {
-			socket.broadcast.to(roomId).emit('userJoin', userName);
+			var data = {userName: userName};
+			emitToRoom(roomId, 'userJoin', data);
 			socket.emit('joinSuccess', usersInRoom(roomId));
-			//socket.emit('joinSuccess', Object.keys(clients));
+		});
+	}
+
+	function leaveRoom(roomId) {
+		socket.leave(roomId);
+		socket.get('userName', function(err, userName) {
+			var data = {userName: userName};
+			emitToRoom(roomId, 'userJoin', data);
 		});
 	}
 
 	function usersInRoom(roomId) {
-		var namespace = '/mainView/' + roomId,
+		var namespace = '/' + roomId,
 			roomClients = io.roomClients,
 			clientIds = Object.keys(io.roomClients),
 			clientsInRoom = [];
@@ -102,23 +114,25 @@ views.mainView = io.of('/mainView').on('connection', function (socket) {
 		return io.sockets.sockets[socketId].store.data.userName;
 	}
 
-	function sendChatMsg(msg) {
+	function emitChatMsg(roomId, msg) {
 		socket.get('userName', function (err, userName) {
-			msg = userName + ": " + msg;
-			socket.emit('chat', msg, 'chatGeneral');
-			socket.broadcast.emit('chat', msg, 'chatGeneral');
+			var data;
+
+			msg = userName + ": " + msg,
+			data = {msg: msg, msgType: 'chatGeneral'};
+			socket.emit('chat', data);
+			emitToRoom(roomId, 'chat', data);
+			//socket.broadcast.emit('chat', msg, 'chatGeneral');
 		});
 	}
 
-	function sendDirectMsg(userName, msg) {
-		var socketUser = clients[userName];
+	function emitDirectMsg(roomId, userName, msg) {
+		var socketUser = clients[userName],
+			data;
 		msg = "(DM) " + userName + ": " + msg;
-		socketUser.emit('chat', msg, 'chatDirect');
+		data = {msg: msg, msgType: 'chatDirect'};
+		socketUser.emit('chat', data);
 	}
-
-	function returnView(viewId) {
-	}
-
 });
 
 /*
