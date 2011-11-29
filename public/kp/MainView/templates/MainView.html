@@ -14,13 +14,11 @@
 	</div>
 
 	<div data-dojo-type="dijit.layout.BorderContainer" data-dojo-attach-point="mainView" class="mainView">
-		<div data-dojo-type="dijit.layout.BorderContainer" isContainer="true" region="top" class="MainViewTitleBar">
-			<div data-dojo-type="dijit.layout.ContentPane" class="mainTitle" region="center">
-				<span data-dojo-attach-point="userNameTitle">UserName</span> - <span data-dojo-attach-point="winCount">0</span> win / <span data-dojo-attach-point="lossCount">0</span> loss
-			</div>
-			<div data-dojo-type="dijit.layout.ContentPane" class="MainViewActions" region="right">
+		<div data-dojo-type="dijit.layout.ContentPane" class="mainViewTitle" region="top">
+			<div class="mainViewActions">
 				<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="joinNewChat">Join Chat</button>
 			</div>
+			<span data-dojo-attach-point="userNameTitle">UserName</span> - <span data-dojo-attach-point="winCount">0</span> win / <span data-dojo-attach-point="lossCount">0</span> loss
 		</div>
 		<div data-dojo-type="dijit.layout.TabContainer" data-dojo-attach-point="userViews" region="center">
 		</div>

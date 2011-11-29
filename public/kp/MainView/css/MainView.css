@@ -1,22 +1,23 @@
-.MainView {
+.mainView {
 	width: 700px;
 	height: 500px;
 	border: 2px solid;
 	position: relative;
 }
 
-.MainView .dijitContainer {
+.mainView .dijitContainer {
 	width: 100%;
 	height: 100%;
 }
 
-.MainView .MainViewTitleBar {
+.mainView .mainViewTitle {
 	width: 100%;
-	height: 60px;
+	height: 40px;
 }
 
-.MainView .MainViewActions {
+.mainView .mainViewActions {
 	width: 100px;
+	float: right;
 }
 
 .fightContainer {

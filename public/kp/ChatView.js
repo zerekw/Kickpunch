@@ -11,20 +11,18 @@ dojo.require("dijit.layout.ContentPane");
 
 dojo.declare("kp.ChatView", [dijit._Widget, dijit._Templated, dijit._Contained], {
 	templateString: dojo.cache("kp.ChatView", "templates/ChatView.html"),
-	baseClass: "ChatView",
+	baseClass: "chatView",
 	widgetsInTemplate: true,
 	constructor: function(options) {
 		this.inherited(arguments);
 		this.socket = options.socket;
-		//this.socket = io.connect("http://localhost/chat");
-		this.title = options.nsp;
+		this.title = options.title || options.nsp;
 		this.nsp = options.nsp;
 	},
 	postCreate: function() {
 		var widget = this,
 			socket;
 
-		this.inherited(arguments);
 		socket = this.socket;
 
 		socket.emit("joinRoom", this.nsp);
@@ -98,7 +96,10 @@ dojo.declare("kp.ChatView", [dijit._Widget, dijit._Templated, dijit._Contained],
 		}
 	},
 	incomingChat: function (data) {
+		console.log('begin on incomingChat');
+		// check to see if we message belongs in this room
 		if (!this.confirmNsp(data.nsp)) { return; }
+		console.log('here');
 
 		if (!data.msgType) {
 			data.msgType = "chatGeneral";
@@ -115,9 +116,9 @@ dojo.declare("kp.ChatView", [dijit._Widget, dijit._Templated, dijit._Contained],
 		});
 	},
 	getChatInput: function () {
-		var msg = this.chatInput.attr("value");
+		var msg = this.chatInput.get("value");
 		//this.chatInput.value = "";
-		this.chatInput.attr("value", "");
+		this.chatInput.set("value", "");
 		return msg;
 	}
 });

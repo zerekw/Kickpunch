@@ -56,6 +56,9 @@ io.sockets.on('connection', function (socket) {
 	function userLogin(userName) {
 		if (userName !== '' && clients[userName] === undefined) {
 			socket.set('userName', userName, function() {
+				// clients needs to become a 2d array
+				// ie clients[nsp][userName] = socket
+				// then we can send a specific message to a client within a room to allow direct messaging to work
 				clients[userName] = socket;
 				socket.emit('loginSuccess', userName);
 			});
@@ -131,6 +134,7 @@ io.sockets.on('connection', function (socket) {
 			data;
 		msg = "(DM) " + userName + ": " + msg;
 		data = {msg: msg, msgType: 'chatDirect'};
+		console.log(socketUser);
 		socketUser.emit('chat', data);
 	}
 });

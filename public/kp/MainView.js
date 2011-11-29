@@ -14,9 +14,9 @@ dojo.require("dijit.layout.ContentPane");
 
 dojo.require("kp.ChatView");
 
-dojo.declare("kp.MainView", [dijit._Widget, dijit._Templated, dijit._Contained], {
+dojo.declare("kp.MainView", [dijit._Widget, dijit._Templated], {
 	templateString: dojo.cache("kp.MainView", "templates/MainView.html"),
-	baseClass: "MainView",
+	baseClass: "mainView",
 	widgetsInTemplate: true,
 	constructor: function() {
 		this.inherited(arguments);
@@ -26,12 +26,11 @@ dojo.declare("kp.MainView", [dijit._Widget, dijit._Templated, dijit._Contained],
 		var widget = this,
 			socket;
 
-		this.inherited(arguments);
 		socket = this.socket;
 
-		this.connect(this.submitLoginButton, "onClick", this.submitLogin);
-		this.connect(this.joinNewChat, "onClick", this.showJoinChatDialog);
-		this.connect(this.submitJoinChat, "onClick", this.joinChat);
+		this.connect(this.submitLoginButton, "onClick", "submitLogin");
+		this.connect(this.joinNewChat, "onClick", "showJoinChatDialog");
+		this.connect(this.submitJoinChat, "onClick", "joinChat");
 
 		socket.on("loginSuccess", function (userName) {
 			widget.loginSuccess(userName);
@@ -44,6 +43,9 @@ dojo.declare("kp.MainView", [dijit._Widget, dijit._Templated, dijit._Contained],
 		socket.on("loadView", function () {
 			widget.loadView(arguments);
 		});
+		socket.on("chat", function (data) {
+			console.log('mainView on chat');
+		});
 
 		dojo.addOnWindowUnload(this.destroy);
 	},
@@ -51,16 +53,16 @@ dojo.declare("kp.MainView", [dijit._Widget, dijit._Templated, dijit._Contained],
 		this.inherited(arguments);
 		this.showLogin();
 	},
-	destroy: function () {
+	uninitialize: function () {
 		// disconnect the node client if the widget is destroyed
 		this.socket.emit('disconnect');
-		this.inherited(arguments);
+		//this.inherited(arguments);
 	},
 	displayError: function (type, msg) {
 		this[type + "Error"].innerHTML = msg;
 	},
 	submitLogin: function () {
-		this.socket.emit("login", this.userName.value);
+		this.socket.emit("login", this.userName.get("value"));
 	},
 	// on error this is still happening
 	loginSuccess: function (userName) {
